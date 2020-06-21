@@ -1,0 +1,28 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "Um turista deseja viajar pelo mundo pagando o menor preço possível independentemente do número de conexões necessárias. Vamos construir um programa que facilite ao nosso turista, escolher a melhor rota para sua viagem.",
+  "main": "test.js",
+  "scripts": {
+    "pretest": "rm -rf temp/files/*",
+    "test": "cross-env NODE_ENV=test mocha  'src/test/travelPath.spec.js'",
+    "start": "node src/index"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "body-parser": "^1.19.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "cross-env": "^7.0.2",
+    "csv-parse": "^4.10.1",
+    "csv-parser": "^2.3.3",
+    "express": "^4.17.1",
+    "express-joi-validation": "^4.0.3",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "mocha": "^8.0.1"
+  }
+}

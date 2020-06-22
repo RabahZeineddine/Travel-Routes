@@ -111,6 +111,8 @@ node main input-routes.csv
   best route: BRC - SCL - ORL - CDG > $30
   ```
 
+  > Para para a aplicação digite: exit
+
 - Interface Rest
   A interface Rest permite:
   - Registro de novas rotas. Essas novas rotas serão persistidas no arquivo csv utilizado como input(input-routes.csv),

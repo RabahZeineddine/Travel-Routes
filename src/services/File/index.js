@@ -39,20 +39,26 @@ FileService.prototype.getFile = function (path, encoding = 'binary') {
  * @param {string} path File path to persist data
  * @param {string} line the new line to be added to the file
  */
-FileService.prototype.addLine = async function (path, line) {
-    try {
-        let content
+FileService.prototype.addLine = function (path, line) {
+    return new Promise((resolve, reject) => {
         try {
-            content = await this.getFile(path, "utf-8")
-            content += `\n${line}`
+            this.getFile(path, "utf-8")
+                .then((content) => {
+                    content += `\n${line}`
+                    this.updateFileContent(path, content)
+                        .then(resolve)
+                        .catch(reject)
+                }).catch((error) => {
+                    if (error.code == 404) {
+                        this.updateFileContent(path, line)
+                            .then(resolve)
+                            .catch(reject)
+                    } else reject(error)
+                })
         } catch (error) {
-            content = line
+            reject(error)
         }
-        this.updateFileContent(path, content)
-    } catch (error) {
-        console.error(error)
-        throw error
-    }
+    })
 }
 
 /**
@@ -60,14 +66,17 @@ FileService.prototype.addLine = async function (path, line) {
  * @param {string} path File path
  * @param {string} content File content to be updated
  */
-FileService.prototype.updateFileContent = async function (path, content) {
-    try {
-        let file = await fs.writeFileSync(this.joinPath(path), content)
-        return file
-    } catch (error) {
-        console.error(error)
-        throw error
-    }
+FileService.prototype.updateFileContent = function (path, content) {
+    return new Promise((resolve, reject) => {
+        try {
+            fs.writeFile(this.joinPath(path), content, (error) => {
+                if (error) reject(error)
+                else resolve()
+            })
+        } catch (error) {
+            reject(error)
+        }
+    })
 }
 
 /**

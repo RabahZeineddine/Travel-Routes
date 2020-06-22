@@ -17,68 +17,76 @@ GraphService.prototype.createGraph = function (input) {
     } else throw new Error('Invalid input')
 }
 
-GraphService.prototype.findShortestPath = async function (graph, startNode, endNode) {
+GraphService.prototype.findShortestPath = function (graph, startNode, endNode) {
+    return new Promise((resolve, reject) => {
+        try {
 
-    // Rastrear a distancia da vertice inicial usando um objeto
-    let distances = {};
-    distances[endNode] = "Infinity";
-    distances = Object.assign(distances, graph[startNode]);
+            // Rastrear a distancia da vertice inicial usando um objeto
+            let distances = {};
+            distances[endNode] = "Infinity";
+            distances = Object.assign(distances, graph[startNode]);
 
-    // Rastrear os caminhos usando objeto
-    let parents = { [endNode]: null };
-    for (let child in graph[startNode]) {
-        parents[child] = startNode;
-    }
-    // Rastrear as vertices visitados
-    let visited = [];
-    // Encontrar a vertice mais proxima
-    let node = shortestDistanceNode(distances, visited);
-
-    while (node) {
-        // Encontrar as distancias entre a vertice e seus "filhos"
-        let distance = distances[node];
-        let children = graph[node];
-
-        // para cada vertice filha
-        for (let child in children) {
-            // Verificar que cada filho não é o mesmo escolhido como vertice inicial
-            if (String(child) === String(startNode)) {
-                continue;
-            } else {
-                // Salvar a distancia da vertice inicial até o filho
-                let newdistance = distance + children[child];
-                // if there's no recorded distance from the start node to the child node in the distances object
-                // Caso não tem registro de distancia de vertice inicial para o filho  ou a distancia encontrada é menor da anterior 
-                if (!distances[child] || distances[child] > newdistance) {
-                    // Salvar a distancia
-                    distances[child] = newdistance;
-                    // salvar o caminho
-                    parents[child] = node;
-                }
+            // Rastrear os caminhos usando objeto
+            let parents = { [endNode]: null };
+            for (let child in graph[startNode]) {
+                parents[child] = startNode;
             }
+            // Rastrear as vertices visitados
+            let visited = [];
+            // Encontrar a vertice mais proxima
+            let node = shortestDistanceNode(distances, visited);
+
+            while (node) {
+                // Encontrar as distancias entre a vertice e seus "filhos"
+                let distance = distances[node];
+                let children = graph[node];
+
+                // para cada vertice filha
+                for (let child in children) {
+                    // Verificar que cada filho não é o mesmo escolhido como vertice inicial
+                    if (String(child) === String(startNode)) {
+                        continue;
+                    } else {
+                        // Salvar a distancia da vertice inicial até o filho
+                        let newdistance = distance + children[child];
+                        // if there's no recorded distance from the start node to the child node in the distances object
+                        // Caso não tem registro de distancia de vertice inicial para o filho  ou a distancia encontrada é menor da anterior 
+                        if (!distances[child] || distances[child] > newdistance) {
+                            // Salvar a distancia
+                            distances[child] = newdistance;
+                            // salvar o caminho
+                            parents[child] = node;
+                        }
+                    }
+                }
+                // marcar a vertice atual como vistiada
+                visited.push(node);
+                // encontrar a proxima vertice
+                node = shortestDistanceNode(distances, visited);
+            }
+
+            // salvar o caminho mais curto
+            let shortestPath = [endNode];
+            let parent = parents[endNode];
+            while (parent) {
+                shortestPath.push(parent);
+                parent = parents[parent];
+            }
+            shortestPath.reverse();
+
+            let results = {
+                distance: distances[endNode],
+                path: shortestPath,
+            };
+
+            let result = ''
+            if (results.distance === 'Infinity') result = 'There is no path available!'
+            else result = `${results.path.join(' - ')} > ${results.distance}`;
+            resolve(result)
+        } catch (error) {
+            reject(error)
         }
-        // marcar a vertice atual como vistiada
-        visited.push(node);
-        // encontrar a proxima vertice
-        node = shortestDistanceNode(distances, visited);
-    }
-
-    // salvar o caminho mais curto
-    let shortestPath = [endNode];
-    let parent = parents[endNode];
-    while (parent) {
-        shortestPath.push(parent);
-        parent = parents[parent];
-    }
-    shortestPath.reverse();
-
-    let results = {
-        distance: distances[endNode],
-        path: shortestPath,
-    };
-
-    if (results.distance === 'Infinity') return 'There is no path available!'
-    return `${results.path.join(' - ')} > ${results.distance}`;
+    })
 }
 
 const shortestDistanceNode = (distances, visited) => {

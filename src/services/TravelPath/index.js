@@ -14,13 +14,19 @@ function TravelPath(
 }
 
 TravelPath.prototype.addRoute = function (source, target, cost) {
-    if ((source && typeof source == 'string' && source != '')
-        && (target && typeof target == 'string' && target != '')
-        && (typeof cost == 'number' && cost != undefined && cost != null)
-        && this.fileService
-    ) {
-        return this.fileService.addLine(this.routeFileName, `${source},${target},${cost}`)
-    } else throw new Error('Invalid parameters')
+    return new Promise((resolve, reject) => {
+        if ((source && typeof source == 'string' && source != '')
+            && (target && typeof target == 'string' && target != '')
+            && (typeof cost == 'number' && cost != undefined && cost != null)
+            && this.fileService
+        ) {
+            this.fileService.addLine(this.routeFileName, `${source},${target},${cost}`)
+                .then(resolve)
+                .catch(reject)
+        } else {
+            reject({ code: 400 })
+        }
+    })
 }
 
 TravelPath.prototype.findShortestPath = function (source, target) {
@@ -31,10 +37,6 @@ TravelPath.prototype.findShortestPath = function (source, target) {
                 .then(graph => this.graphService.findShortestPath(graph, source, target))
                 .then(resolve)
                 .catch(reject)
-
-            // const graph = await this.graphService.createGraph(input)
-            // let result = await this.graphService.findShortestPath(graph, source, target)
-            // resolve(result)
         } catch (error) {
             reject({ code: error.code || 500 })
         }

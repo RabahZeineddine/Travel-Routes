@@ -5,7 +5,7 @@
   "main": "test.js",
   "scripts": {
     "pretest": "rm -rf temp/files/*",
-    "test": "cross-env NODE_ENV=test mocha  'src/test/travelPath.spec.js'",
+    "test": "cross-env NODE_ENV=test mocha  --exit --bail 'src/test/travelPath.spec.js'",
     "start": "node src/index"
   },
   "author": "",

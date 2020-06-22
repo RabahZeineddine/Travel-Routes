@@ -27,12 +27,15 @@ const initRouter = () => {
     return router
 }
 
-const addPathRoute = async (req, res) => {
+const addPathRoute = (req, res) => {
     try {
         const { from, to, cost } = req.body
         const travelPathService = new TravelPathService(new FileService())
         travelPathService.addRoute(from, to, cost)
-        res.status(201).end()
+            .then(result => res.status(201).end())
+            .catch(error => {
+                res.status(getErrorStatusCode(error)).json({ message: getErrorMessage(error) })
+            })
     } catch (error) {
         console.error(error)
         res.status(error.code || 500).json({ message: getErrorMessage(error) })
